@@ -27,7 +27,7 @@ const requestMethod = {
     const issueId = uuidv4();
     const postResponse = await postItem(context, 'Issues', [{
       name: 'id',
-      type: TYPES.Int,
+      type: TYPES.VarChar,
       value: issueId
     }, {
         name: 'title',

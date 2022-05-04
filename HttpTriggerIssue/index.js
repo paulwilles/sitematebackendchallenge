@@ -6,10 +6,6 @@ const requestMethod = {
   }, // 'GET'
 
   'PUT': async (context, issue, { title, description }) => {
-    if (!title) return ({
-      status: 400,
-      body: { error: 'Must include title'}
-    });
     const putResponse = await putItem(context, 'Issues', issue.id, [{
       name: 'title',
       type: TYPES.VarChar,

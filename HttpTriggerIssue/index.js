@@ -1,19 +1,23 @@
-const { getItem, putItem, deleteItem, TYPES, getItems } = require('../sharedCode/rest');
+const { getItem, putItem, deleteItem, TYPES } = require('../sharedCode/rest');
 
 const requestMethod = {
   'GET': async (context, issue) => {
     return {status: 200, body: issue}
   }, // 'GET'
 
-  'PUT': async (context, issue, { name }) => {
-    if (!name) return ({
+  'PUT': async (context, issue, { title, description }) => {
+    if (!title) return ({
       status: 400,
-      body: { error: 'Must include name'}
+      body: { error: 'Must include title'}
     });
     const putResponse = await putItem(context, 'Issues', issue.id, [{
-      name: 'name',
+      name: 'title',
       type: TYPES.VarChar,
-      value: name
+      value: title
+    }, {
+      name: 'description',
+      type: TYPES.VarChar,
+      value: description
     }]);
     if (!putResponse || !putResponse.status) return {
       status: 500, body: { error: 'bad response' }
@@ -22,45 +26,6 @@ const requestMethod = {
   }, // 'PUT'
 
   'DELETE': async (context, issue) => {
-    const installationResponse = await getItems(context, 'Installations', [{
-      name: 'issueId',
-      type: TYPES.VarChar,
-      value: issue.id
-    }]);
-    if (!installationResponse || !installationResponse.status) return {
-      status: 500, body: { error: 'bad response' }
-    }
-    if (installationResponse.status !== 200 && installationResponse.status !== 204) return installationResponse;
-    if (installationResponse.body.length) return {
-      status: 400, body: { error: 'Issue has installations' }
-    }
-
-    const probesResponse = await getItems(context, 'Probes', [{
-      name: 'issueId',
-      type: TYPES.VarChar,
-      value: issue.id
-    }]);
-    if (!probesResponse || !probesResponse.status) return {
-      status: 500, body: { error: 'bad response' }
-    }
-    if (probesResponse.status !== 200 && probesResponse.status !== 204) return probesResponse;
-    if (probesResponse.body.length) return {
-      status: 400, body: { error: 'Issue has probes' }
-    }
-
-    const usersResponse = await getItems(context, 'Users', [{
-      name: 'issueId',
-      type: TYPES.VarChar,
-      value: issue.id
-    }]);
-    if (!usersResponse || !usersResponse.status) return {
-      status: 500, body: { error: 'bad response' }
-    }
-    if (usersResponse.status !== 200 && usersResponse.status !== 204) return usersResponse;
-    if (usersResponse.body.length) return {
-      status: 400, body: { error: 'Issue has users' }
-    }
-
     const deleteResponse = await deleteItem(context, 'Issues', issue.id);
     if (!deleteResponse || !deleteResponse.status) return {
       status: 500, body: { error: 'bad response' }
